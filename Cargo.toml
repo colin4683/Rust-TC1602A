@@ -1,0 +1,12 @@
+[package]
+name = "lcd-rust"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+rppal = "0.22.1"
+reqwest = { version="0.12.12", features=["json", "blocking"] }
+serde_json = "1.0.137"
+serde = { version = "1.0.217", features = ["derive"] }
+rand = "0.8.5"
+dotenv = "0.15.0"

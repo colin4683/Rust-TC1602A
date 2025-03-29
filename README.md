@@ -7,6 +7,22 @@ TC1602A-01T Driver for Rust
 - This example displays the current BTC price so the api functionality for that is in
 ```/src/api/mod.rs```
 
+### LCD Functions
+| Function           | Parameters                        | Description                                              |
+|--------------------|----------------------------------|----------------------------------------------------------|
+| `new()`           | None                             | Creates a new instance of the LCD.                      |
+| `pulse_enable()`  | None                             | Sends a short pulse to the enable pin.                  |
+| `clear_buses()`   | None                             | Sets all data bus pins to LOW.                          |
+| `send_nibble()`   | `nibble: u8`                     | Sends 4 bits to the LCD.                                |
+| `send_byte()`     | `byte: u8, is_data: bool`        | Sends 8 bits (two nibbles) to the LCD.                  |
+| `set_function()`  | `data_length: u8, num_lines: u8, font: u8` | Configures the display mode (4-bit/8-bit, lines, font). |
+| `set_display_mode()` | `display_on: bool, cursor_on: bool, cursor_blink: bool` | Configures display settings. |
+| `move_to_line()`  | `line: u8`                      | Moves the cursor to a specific line.                    |
+| `shift_right()`   | None                             | Shifts the display to the right.                        |
+| `clear_display()` | None                             | Clears the LCD display.                                 |
+| `initialize()`    | None                             | Initializes the LCD with default settings.              |
+| `display_message()` | `message: &str`               | Displays a string on the LCD.                           |
+
 Data sheet for the LCD:
 | PinNo. | Symbol | Level  | Description |
 |--------|--------|--------|-------------|
@@ -42,18 +58,3 @@ Data sheet for the LCD:
 | LINE_1 | 0x80    | Start address of line 1.  |
 | LINE_2 | 0xC0    | Start address of line 2.  |
 
-### LCD Functions
-| Function           | Parameters                        | Description                                              |
-|--------------------|----------------------------------|----------------------------------------------------------|
-| `new()`           | None                             | Creates a new instance of the LCD.                      |
-| `pulse_enable()`  | None                             | Sends a short pulse to the enable pin.                  |
-| `clear_buses()`   | None                             | Sets all data bus pins to LOW.                          |
-| `send_nibble()`   | `nibble: u8`                     | Sends 4 bits to the LCD.                                |
-| `send_byte()`     | `byte: u8, is_data: bool`        | Sends 8 bits (two nibbles) to the LCD.                  |
-| `set_function()`  | `data_length: u8, num_lines: u8, font: u8` | Configures the display mode (4-bit/8-bit, lines, font). |
-| `set_display_mode()` | `display_on: bool, cursor_on: bool, cursor_blink: bool` | Configures display settings. |
-| `move_to_line()`  | `line: u8`                      | Moves the cursor to a specific line.                    |
-| `shift_right()`   | None                             | Shifts the display to the right.                        |
-| `clear_display()` | None                             | Clears the LCD display.                                 |
-| `initialize()`    | None                             | Initializes the LCD with default settings.              |
-| `display_message()` | `message: &str`               | Displays a string on the LCD.                           |

@@ -1,14 +1,13 @@
-use crate::api::{CoinData, API};
-use dotenv::dotenv;
-use std::io::{Write};
+use crate::api::{API};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{env, thread};
+use std::{thread};
 use serde::{Deserialize, Serialize};
 
 pub mod api;
 pub mod lcd;
 
+#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
 struct CoinData {
     pub id: String,
@@ -17,13 +16,12 @@ struct CoinData {
     pub priceUsd: String,
 }
 
-fn main() {
-    dotenv().ok();
+#[derive(Serialize, Deserialize)]
+struct CoinResponse {
+    pub data: Vec<CoinData>
+}
 
-    let api_url = env::var("API_URL").unwrap_or_else(|_| {
-        eprintln!("API_URL must be set");
-        std::process::exit(1);
-    });
+fn main() {
 
     // initialize everything
     let mut lcd = lcd::Lcd::new();
@@ -36,8 +34,7 @@ fn main() {
     let coin_clone = Arc::clone(&coin_data);
     let is_fetching_clone = Arc::clone(&is_fetching);
 
-    const data_endpoint: String = "https://api.coincap.io/v2/assets".to_string();
-
+    let data_endpoint: &str = "https://api.coincap.io/v2/assets";
     // API thread
     thread::spawn(move || {
         loop {
@@ -49,10 +46,10 @@ fn main() {
                 *fetching_lock = true;
             }
 
-            match API::make_get::<Vec<CoinData>>(data_endpoint) {
+            match API::make_get::<CoinResponse>(data_endpoint) {
                 Ok(new_info) => {
                     let mut coin_lock = coin_clone.lock().unwrap();
-                    *coin_lock = new_info;
+                    *coin_lock = new_info.data;
                 }
                 Err(e) => {
                     eprintln!("error fetching new info: {:?}", e);
@@ -88,29 +85,34 @@ fn main() {
                     lcd.display_message("updating...");
                 } else {
                     let coin_lock = coin_clone.lock().unwrap();
-
-                    let current_coin = coin_lock
-                        .get(switcher)
-                        .map_or("".to_string(), |coin| coin.symbol.clone());
-
-                    let current_price = coin_lock
-                        .get(switcher)
-                        .map_or("".to_string(), |coin| coin.priceUsd.clone())
-                        .parse::<f64>()
-                        .unwrap_or(0.0);
-
-                    lcd.clear_display();
-
-                    lcd.move_to_line(1);
-                    lcd.display_message(&format!("{}", current_coin));
-
-                    lcd.move_to_line(2);
-                    lcd.display_message(&format!("${:.2}", current_price));
-
-                    if switcher >= coin_lock.len() - 1 {
-                        switcher = 0;
+                    if coin_lock.len() <= 0 {
+                        lcd.clear_display();
+                        lcd.move_to_line(1);
+                        lcd.display_message("error");
                     } else {
-                        switcher += 1;
+                        let current_coin = coin_lock
+                            .get(switcher)
+                            .map_or("".to_string(), |coin| coin.symbol.clone());
+
+                        let current_price = coin_lock
+                            .get(switcher)
+                            .map_or("".to_string(), |coin| coin.priceUsd.clone())
+                            .parse::<f64>()
+                            .unwrap_or(0.0);
+
+                        lcd.clear_display();
+
+                        lcd.move_to_line(1);
+                        lcd.display_message(&format!("{}", current_coin));
+
+                        lcd.move_to_line(2);
+                        lcd.display_message(&format!("${:.2}", current_price));
+
+                        if switcher >= coin_lock.len() - 1 {
+                            switcher = 0;
+                        } else {
+                            switcher += 1;
+                        }
                     }
                 }
             }

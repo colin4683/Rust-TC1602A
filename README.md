@@ -7,6 +7,9 @@ TC1602A-01T Driver for Rust
 - This example displays the current BTC price so the api functionality for that is in
 ```/src/api/mod.rs```
 
+## Demo
+[![Demo](https://github.com/user-attachments/assets/43006fe1-7faa-46c4-a6dd-bbc571c46129)](https://files.catbox.moe/wux2lx.MP4)
+
 ### LCD Functions
 | Function           | Parameters                        | Description                                              |
 |--------------------|----------------------------------|----------------------------------------------------------|
